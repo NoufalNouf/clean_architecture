@@ -34,7 +34,7 @@ class LoginForm extends StatelessWidget {
           ),
           TextField(
             controller: _passwordController,
-            decoration: InputDecoration(labelText: 'Password'),
+            decoration: InputDecoration(labelText: 'Password',disabledBorder: OutlineInputBorder()),
             obscureText: true,
           ),
           SizedBox(height: 20),
