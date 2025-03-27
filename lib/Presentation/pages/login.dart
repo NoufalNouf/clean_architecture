@@ -27,17 +27,19 @@ class LoginForm extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
+        spacing: 20,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           TextField(
             controller: _usernameController,
-            decoration: InputDecoration(labelText: 'Username'),
+            decoration: InputDecoration(labelText: 'Username',border: OutlineInputBorder()),
           ),
           TextField(
             controller: _passwordController,
-            decoration: InputDecoration(labelText: 'Password',disabledBorder: OutlineInputBorder()),
+            decoration: InputDecoration(labelText: 'Password',border: OutlineInputBorder()),
             obscureText: true,
           ),
-          SizedBox(height: 20),
+          SizedBox(height: 10),
           BlocConsumer<LoginBloc, LoginState>(
             listener: (context, state) {
               if (state is LoginFailure) {
