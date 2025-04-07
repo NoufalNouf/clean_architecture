@@ -1,22 +1,33 @@
+import 'dart:async';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-
-
-import '../../../Domain/entities/user.dart';
-
-import '../Domain/Repository/auth_repository.dart';
+import '../../Domain/Entity/user.dart';
+import '../../Domain/UseCases/is_loggedin_usecase.dart';
+import '../../Domain/UseCases/signin_usecase.dart';
+import '../../Domain/UseCases/signout_usecase.dart';
+import '../../Domain/UseCases/signup_usecase.dart';
 import 'authbloc_event.dart';
 import 'authbloc_state.dart';
 
-
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
-  final AuthRepository authRepository;
+  final SignUpUseCase signUpUseCase;
+  final SignInUseCase signInUseCase;
+  final IsLoggedInUseCase isLoggedInUseCase;
+  final SignOutUseCase signOutUseCase;
 
-  AuthBloc(this.authRepository) : super(AuthInitial()) {
+  AuthBloc({
+    required this.signUpUseCase,
+    required this.signInUseCase,
+    required this.isLoggedInUseCase,
+    required this.signOutUseCase,
+  }) : super(AuthInitial()) {
     on<SignUpRequested>((event, emit) async {
       emit(AuthLoading());
       try {
-        await authRepository.signUp(User(email: event.email, password: event.password));
+        await signUpUseCase(
+          UserEntity(email: event.email, password: event.password),
+        );
         emit(Authenticated(event.email));
       } catch (e) {
         emit(AuthFailure("Sign up failed"));
@@ -26,7 +37,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<SignInRequested>((event, emit) async {
       emit(AuthLoading());
       try {
-        final user = await authRepository.signIn(event.email, event.password);
+        final user = await signInUseCase(event.email, event.password);
         if (user != null) {
           emit(Authenticated(user.email));
         } else {
@@ -38,18 +49,23 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     });
 
     on<CheckAuthStatus>((event, emit) async {
-      final isLoggedIn = await authRepository.isLoggedIn();
+      final isLoggedIn = await isLoggedInUseCase();
       if (isLoggedIn) {
-        final user = await authRepository.signIn('', '');
-        emit(Authenticated(user?.email ?? ''));
+        emit(Authenticated("User is logged in"));
       } else {
         emit(Unauthenticated());
       }
     });
 
     on<SignOutRequested>((event, emit) async {
-      await authRepository.signUp(User(email: '', password: ''));
+      await signOutUseCase();
       emit(Unauthenticated());
     });
+
+
+   on<UserEmailTyped>(userEmailTyped);
+  }
+  FutureOr<void> userEmailTyped(UserEmailTyped event, Emitter<AuthState> emit) {
+    
   }
 }

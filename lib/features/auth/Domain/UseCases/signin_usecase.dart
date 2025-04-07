@@ -1,12 +1,12 @@
-import '../Repository/auth_repository.dart';
-import '../entities/user.dart';
+import '../../Data/repository/auth_repository_impl.dart' show AuthRepositoryImpl;
+import '../Entity/user.dart';
 
 class SignInUseCase {
-  final AuthRepository repository;
+  final AuthRepositoryImpl repository;
 
   SignInUseCase(this.repository);
 
-  Future<User?> call(String email, String password) async {
+  Future<UserEntity?> call(String email, String password) async {
     return await repository.signIn(email, password);
   }
 }
